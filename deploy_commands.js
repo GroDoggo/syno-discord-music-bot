@@ -1,27 +1,40 @@
 import { REST, Routes } from 'discord.js';
-import { clientId, guildId, token } from './config.json';
+import { config } from 'dotenv';
 import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// get the name of the directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get Discord token
+config();
+const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.CLIENT_ID;
+const guildId = process.env.GUILD_ID;
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier
-const foldersPath = join(__dirname, 'commands');
+const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
 	// Grab all the command files from the commands directory you created earlier
-	const commandsPath = join(foldersPath, folder);
+	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 	for (const file of commandFiles) {
-		const filePath = join(commandsPath, file);
-		const command = require(filePath);
-		if ('data' in command && 'execute' in command) {
-			commands.push(command.data.toJSON());
-		}
-		else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
+		const filePath = path.join(commandsPath, file);
+		await import(`${filePath}`).then((command) => {
+			if ('data' in command && 'execute' in command) {
+				commands.push(command.data.toJSON());
+				console.log(`[LOG] The command ${command.data.name} as been registed`);
+			}
+			else {
+				console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			}
+		});
 	}
 }
 
