@@ -1,8 +1,13 @@
 // Require the necessary discord.js classes
-import { fs } from 'node:fs';
-import { path } from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
+
+// get the name of the directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get Discord token
 config();
@@ -21,14 +26,15 @@ for (const folder of commandFolders) {
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		}
-		else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
+		import(`${filePath}`).then((command) => {
+			if ('data' in command && 'execute' in command) {
+				client.commands.set(command.data.name, command);
+				console.log(`[LOG] The command ${command.data.name} as been registed`);
+			}
+			else {
+				console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			}
+		});
 	}
 }
 
