@@ -1,9 +1,9 @@
 // Require the necessary discord.js classes
-const { Client, Events, GatewayIntentBits } = require('discord.js');
-const dotenv = require('dotenv');
+import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { config } from 'dotenv';
 
 // Get Discord token
-dotenv.config();
+config();
 const token = process.env.DISCORD_TOKEN;
 
 // Create a new client instance
