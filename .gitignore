@@ -1,3 +1,9 @@
+# env var
+.env
+
+# local test only
+test.js
+
 # Logs
 logs
 *.log
