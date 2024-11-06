@@ -14,7 +14,7 @@ export async function execute(interaction) {
 	const _adapterCreator = interaction.guild.voiceAdapterCreator;
 
 	if (_channelid == null) {
-		await interaction.reply('Please connect to the channel to connect before execute this command');
+		await interaction.reply({ content: 'Please connect to the channel to connect before execute this command', ephemeral: true });
 	}
 	else {
 		const connection = joinVoiceChannel({
@@ -22,6 +22,6 @@ export async function execute(interaction) {
 			guildId: _guildid,
 			adapterCreator: _adapterCreator,
 		});
-		await interaction.reply('Connected !');
+		await interaction.reply({ content: 'Connected !', ephemeral: true });
 	}
 }
