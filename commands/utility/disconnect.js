@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { getVoiceConnection } from '@discordjs/voice';
+import { log, warn, error } from '../../utils/logger.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('disconnect')
@@ -21,10 +22,10 @@ export async function execute(interaction) {
 	try {
 		// Détruire la connexion
 		connection.destroy();
-        console.log('[LOG] Disconnected from the voice channel!')
+        log('Disconnected from the voice channel!')
 		await interaction.reply('Disconnected from the voice channel!');
 	} catch (error) {
-		console.error(`[ERROR] Failed to disconnect: ${error}`);
+		error(`Failed to disconnect: ${error}`);
 		await interaction.reply({
 			content: 'An error occurred while trying to disconnect from the voice channel.',
 			ephemeral: true,

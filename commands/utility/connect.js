@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { joinVoiceChannel } from '@discordjs/voice';
+import { log, warn, error } from '../../utils/logger.js';
 
 export const data = new SlashCommandBuilder()
 	.setName('connect')
@@ -26,10 +27,10 @@ export async function execute(interaction) {
 			adapterCreator: memberVoiceChannel.guild.voiceAdapterCreator,
 		});
 
-        console.log(`Connected to ${memberVoiceChannel.name}!`)
+        log(`Connected to ${memberVoiceChannel.name}!`)
 		await interaction.reply(`Connected to ${memberVoiceChannel.name}!`);
 	} catch (error) {
-		console.error(`[ERROR] Failed to connect: ${error}`);
+		error(`Failed to connect: ${error}`);
 		await interaction.reply({
 			content: 'An error occurred while trying to connect to the voice channel.',
 			ephemeral: true,

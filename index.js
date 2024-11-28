@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
+import { log, warn, error } from './utils/logger.js';
 
 // get the name of the directory
 const __filename = fileURLToPath(import.meta.url);
@@ -36,10 +37,10 @@ async function registerCommands() {
 			import(`${filePath}`).then((command) => {
 				if ('data' in command && 'execute' in command) {
 					client.commands.set(command.data.name, command);
-					console.log(`[LOG] The command ${command.data.name} as been registed`);
+					log(`The command ${command.data.name} as been registed`);
 				}
 				else {
-					console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+					warn(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 				}
 			});
 		}
@@ -50,7 +51,7 @@ async function registerCommands() {
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
 // It makes some properties non-nullable.
 client.once(Events.ClientReady, readyClient => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+	log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
 // When receiving an non chat interaction, process the according command
@@ -60,7 +61,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
+		error(`No command matching ${interaction.commandName} was found.`);
 		return;
 	}
 
@@ -68,7 +69,7 @@ client.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction);
 	}
 	catch (error) {
-		console.error(error);
+		error(error);
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
