@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { log, warn, error } from './utils/logger.js';
 
 // get the name of the directory
 const __filename = fileURLToPath(import.meta.url);
@@ -29,10 +30,10 @@ for (const folder of commandFolders) {
 		await import(`${filePath}`).then((command) => {
 			if ('data' in command && 'execute' in command) {
 				commands.push(command.data.toJSON());
-				console.log(`[LOG] The command ${command.data.name} as been registed`);
+				log(`The command ${command.data.name} as been registed`);
 			}
 			else {
-				console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+				warn(`The command at ${filePath} is missing a required "data" or "execute" property.`);
 			}
 		});
 	}
@@ -44,7 +45,7 @@ const rest = new REST().setToken(token);
 // and deploy your commands!
 (async () => {
 	try {
-		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+		log(`Started refreshing ${commands.length} application (/) commands.`);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
@@ -52,10 +53,10 @@ const rest = new REST().setToken(token);
 			{ body: commands },
 		);
 
-		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+		log(`Successfully reloaded ${data.length} application (/) commands.`);
 	}
 	catch (error) {
 		// And of course, make sure you catch and log any errors!
-		console.error(error);
+		error(error);
 	}
 })();
