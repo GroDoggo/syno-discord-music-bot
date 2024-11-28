@@ -14,7 +14,12 @@ config();
 const token = process.env.DISCORD_TOKEN;
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildVoiceStates // Requis pour gérer les connexions vocales
+	]
+});
 
 // Register commands
 client.commands = new Collection();
