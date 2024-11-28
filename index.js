@@ -18,23 +18,26 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Register commands
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		import(`${filePath}`).then((command) => {
-			if ('data' in command && 'execute' in command) {
-				client.commands.set(command.data.name, command);
-				console.log(`[LOG] The command ${command.data.name} as been registed`);
-			}
-			else {
-				console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-			}
-		});
+async function registerCommands() {
+	const foldersPath = path.join(__dirname, 'commands');
+	const commandFolders = fs.readdirSync(foldersPath);
+
+	for (const folder of commandFolders) {
+		const commandsPath = path.join(foldersPath, folder);
+		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			import(`${filePath}`).then((command) => {
+				if ('data' in command && 'execute' in command) {
+					client.commands.set(command.data.name, command);
+					console.log(`[LOG] The command ${command.data.name} as been registed`);
+				}
+				else {
+					console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+				}
+			});
+		}
 	}
 }
 
@@ -71,4 +74,7 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 // Log in to Discord with your client's token
-client.login(token);
+(async () => {
+	await registerCommands();
+	client.login(token);
+})();
