@@ -1,6 +1,9 @@
 # env var
 .env
 
+# music files
+music/*
+
 # local test only
 test.js
 
